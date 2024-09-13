@@ -39,7 +39,9 @@ def get_consistency_per_neuron(X, Y, X1, X2, Y1, Y2, metric="pearsonr"):
     r_yy_sb = sb_correction(r_yy)
 
     # Check if the product is negative or close to zero to avoid runtime warning
-    # functionally, the code is the same as before, since when the denominator is complex or zero, r_xy_n_sb is still NaN
+    # functionally, the code is the same as before, since when the denominator is complex or zero, then r_xy_n_sb is still NaN
+    # this should be the case since the metric's derivation is theoretically undefined if r_xx and r_yy are negative,
+    # as transitive property of correlation is no longer guaranteed in this case
     r_product = r_xx_sb * r_yy_sb
     if (r_product < 0) or np.isclose(r_product, 0):
         denom_sb = np.nan
