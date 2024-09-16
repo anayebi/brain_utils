@@ -38,9 +38,17 @@ def get_consistency_per_neuron(X, Y, X1, X2, Y1, Y2, metric="pearsonr"):
     r_yy = metric_func(Y1, Y2)[0]
     r_yy_sb = sb_correction(r_yy)
 
-    denom_sb = (r_xx_sb * r_yy_sb) ** 0.5
-
-    r_xy_n_sb = r_xy / denom_sb
+    # Check if the product is negative or close to zero to avoid runtime warning
+    # functionally, the code is the same as before, since when the denominator is complex or zero, then r_xy_n_sb is still NaN
+    # this should be the case since the metric's derivation is theoretically undefined if r_xx and r_yy are negative,
+    # as transitive property of correlation is no longer guaranteed in this case
+    r_product = r_xx_sb * r_yy_sb
+    if (r_product < 0) or np.isclose(r_product, 0):
+        denom_sb = np.nan
+        r_xy_n_sb = np.nan
+    else:
+        denom_sb = (r_product) ** 0.5
+        r_xy_n_sb = r_xy / denom_sb
 
     reg_metrics = {
         "r_xy_n_sb": r_xy_n_sb,
@@ -55,7 +63,16 @@ def get_consistency_per_neuron(X, Y, X1, X2, Y1, Y2, metric="pearsonr"):
 
 
 def get_linregress_consistency_persplit(
-    X, Y, X1, X2, Y1, Y2, map_kwargs, train_idx, test_idx, metric="pearsonr",
+    X,
+    Y,
+    X1,
+    X2,
+    Y1,
+    Y2,
+    map_kwargs,
+    train_idx,
+    test_idx,
+    metric="pearsonr",
 ):
     assert "rsa" not in metric
     if map_kwargs is None:
@@ -214,7 +231,6 @@ def get_linregress_consistency(
     start_seed=1234,
     **kwargs
 ):
-
     """
     The main function for computing the linear regression consistency (noise corrected)
     between source and target.
