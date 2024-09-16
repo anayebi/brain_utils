@@ -151,7 +151,8 @@ class PercentileNeuralMap(nm.NeuralMapBase):
         ), f"Number of train features ({self._n_source}) does not align with number of test features ({X.shape[1]})"
 
         n_samples = X.shape[0]
-        preds = np.empty((n_samples, self._n_targets)) + np.NaN
+        #preds = np.empty((n_samples, self._n_targets)) + np.NaN
+        preds = np.full((n_samples, self._n_targets), np.nan)
         for i, mapper in enumerate(self._mappers):
             if self._identity:
                 assert isinstance(mapper, np.int64)  # mapper contains the source index
