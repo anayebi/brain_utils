@@ -9,34 +9,43 @@ cd brainmodel_utils/
 pip install -e .
 ```
 
-# Code Formatting:
-Put this in `.git/hooks/pre-commit`, and run `sudo chmod +x .git/hooks/pre-commit`.
+# Usage:
+After installing the package, you can use it as follows:
 
 ```
-#!/usr/bin/env bash
-  
-echo "# Running pre-commit hook"
-echo "#########################"
+from brainmodel_utils.metrics.consistency import get_linregress_consistency
+import numpy as np
 
-echo "Checking formatting"
+# Example data (substitute with your actual model/data!)
+source = np.random.randn(100, 50)  # 100 stimuli, 50 model features
 
-format_occurred=false
-declare -a black_dirs=("brainmodel_utils/" "setup.py")
-for black_dir in "${black_dirs[@]}"; do
-    echo ">>> Checking $black_dir"
-    black --check "$black_dir"
+# Alternatively, if `source` is from another animal (rather than a model),
+# you can include a trials dimension:
+target = np.random.randn(20, 100, 50)  # 20 trials, 100 stimuli, 50 units
 
-    if [ $? -ne 0 ]; then
-        echo ">>> Reformatting now!"
-        black "$black_dir"
-        format_occurred=true
-    fi
-done
+# Linear regression parameters (in this case, Ridge with a user defined alpha)
+map_kwargs = {
+                "map_type": "sklinear",
+                "map_kwargs": {
+                    "regression_type": "Ridge",
+                    "regression_kwargs": {"alpha": alpha},
+                },
+            }
 
-if [ "$format_occurred" = true ]; then
-    exit 1
-fi
+# Compute consistency
+consistency_results = get_linregress_consistency(
+    source=source,
+    target=target,
+    map_kwargs=map_kwargs,
+    num_bootstrap_iters=1000,  # Number of bootstrap split-half iterations
+    num_parallel_jobs=100,     # Parallelization across split-halves
+    start_seed=42,             # Reproducibility seed
+    metric="pearsonr"          # Use "rsa_pearsonr" for RSA, in which case use an Identity Map
+)
+
+print(consistency_results)
 ```
+
 # License
 MIT
 
