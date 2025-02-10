@@ -41,7 +41,8 @@ consistency_results = get_linregress_consistency(
     num_bootstrap_iters=1000,  # Number of bootstrap split-half iterations
     num_parallel_jobs=100,     # Parallelization across split-halves for speed
     start_seed=42,             # Reproducibility seed
-    metric="pearsonr"          # Use "rsa_pearsonr/spearmanr" for RSA instead, in which case use an Identity Map (see below)
+    metric="pearsonr"          # Use "rsa_pearsonr/spearmanr" for RSA instead,
+                               # in which case use an Identity Map (see below)
 )
 
 print(consistency_results)
@@ -81,7 +82,9 @@ map_kwargs = {
     },
 }
 
-# Partial Least Squares (PLS) regression. Note we do not use `sklinear` for this, since `scikit-learn` sets `scale=True` by default for PLS, which is **not** what we want for neural data (we want `scale=False`).
+# Partial Least Squares (PLS) regression. Note we do not use `sklinear` for this,
+# since `scikit-learn` sets `scale=True` by default for PLS,
+# which is **not** what we want for neural data (we want `scale=False`).
 map_kwargs = {
     "map_type": "pls",
     "map_kwargs": {
