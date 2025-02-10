@@ -22,7 +22,8 @@ source = np.random.randn(100, 50)  # 100 stimuli, 50 model features
 # Alternatively, if `source` is from another animal (rather than a model), you can include a trials dimension:
 target = np.random.randn(20, 100, 50)  # 20 trials, 100 stimuli, 50 units
 
-## Linear regression parameters (we usually recommend Ridge with a user defined alpha that has been cross-validated via median consistency on a val set of your choosing!)
+## Linear regression parameters (we usually recommend Ridge with a user defined alpha that has been cross-validated
+# via median consistency on a val set of your choosing!)
 alpha = 1.0
 map_kwargs = {
                 "map_type": "sklinear",
