@@ -96,6 +96,77 @@ map_kwargs = {
 
 Under the hood, [`PipelineNeuralMap`](https://github.com/neuroagents-lab/brainmodel_utils/blob/main/brainmodel_utils/neural_mappers/pipeline_neural_map.py) is called for each of these, which can chain these mappings with additional factorization if you like, by passing in `factor_kwargs`.
 
+# Return Type:
+The function returns a dictionary of values. The most relevant one, which contains the predictivity per neuron is **`"r_xy_n_sb"`**.
+
+The convention is that:
+- **`X`** refers to the source (brain or model)
+- **`Y`** refers to the target brain
+- **`r`** is the Pearson or Spearman correlation
+- **`n`** indicates that the metric is computed per neuron
+- **`sb`** refers to the Spearman-Brown correction applied to the split-half consistencies in the denominator
+
+With this convention in mind, we now explain each of the keys and values of the dictionary that is returned:
+
+---
+
+### High-Level Structure
+
+The dictionary has two top-level keys: **`"train"`** and **`"test"`**, each mapping to another dictionary containing the following metrics:
+
+- **`r_xy_n_sb`**  
+  Noise-corrected correlation (Spearman-Brown corrected) computed per neuron.  
+  This is the primary metric indicating predictivity of the source–target mapping.
+
+- **`r_xx`**  
+  Split-half correlation of the source’s predicted responses.
+
+- **`r_xx_sb`**  
+  Spearman-Brown–corrected split-half correlation of the source’s predicted responses.
+
+- **`r_yy`**  
+  Split-half correlation of the actual target brain responses.
+
+- **`r_yy_sb`**  
+  Spearman-Brown–corrected split-half correlation of the actual target brain responses.
+
+- **`r_xy`**  
+  Raw correlation between predicted and actual responses (uncorrected for noise).
+
+- **`denom_sb`**  
+  The denominator used in the noise-corrected correlation (the full "Statistical Noise Ceiling"):  
+  ```math
+  \text{denom\_sb} = \sqrt{\left(\text{r\_xx\_sb}\right) \cdot \left(\text{r\_yy\_sb}\right)}
+  ```
+  If this value is undefined (e.g., negative or zero), **`r_xy_n_sb`** is set to NaN.
+
+---
+
+### Example of the Returned Structure
+
+```python
+{
+    "train": {
+        "r_xy_n_sb": <[bootstraps, splits, units]>,
+        "r_xx":      <[bootstraps, splits, units]>,
+        "r_xx_sb":   <[bootstraps, splits, units]>,
+        "r_yy":      <[bootstraps, splits, units]>,
+        "r_yy_sb":   <[bootstraps, splits, units]>,
+        "r_xy":      <[bootstraps, splits, units]>,
+        "denom_sb":  <[bootstraps, splits, units]>
+    },
+    "test": {
+        "r_xy_n_sb": <[bootstraps, splits, units]>,
+        "r_xx":      <[bootstraps, splits, units]>,
+        "r_xx_sb":   <[bootstraps, splits, units]>,
+        "r_yy":      <[bootstraps, splits, units]>,
+        "r_yy_sb":   <[bootstraps, splits, units]>,
+        "r_xy":      <[bootstraps, splits, units]>,
+        "denom_sb":  <[bootstraps, splits, units]>
+    }
+}
+```
+
 # License
 MIT
 
