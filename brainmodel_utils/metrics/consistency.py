@@ -243,10 +243,31 @@ def get_linregress_consistency(
     start_seed: Starting seed for generating split halves (for reproducibility).
 
     Optional Arguments:
+    -------------------
     metric: Correlation metric (across stimuli) used per neuron. Default is Pearson's R.
             Other choices can be "spearmanr", for example.
     splits: Your own list of {"train", "test"} split indices.
             If "splits" is None, you can additionally specify train_frac and num_train_test_splits to generate your own.
+
+    Returns (see README for full details):
+    --------------------------------------
+    dict
+        A dictionary with two main keys, "train" and "test", each mapping to a dict containing:
+        
+        - "r_xy_n_sb": Noise-corrected (Spearman-Brown) per-neuron correlation 
+                       indicating predictivity of the source for the target.
+        - "r_xx", "r_xx_sb": Split-half correlation and Spearman-Brown–corrected
+                            correlation for the source’s predicted responses.
+        - "r_yy", "r_yy_sb": Split-half correlation and Spearman-Brown–corrected
+                            correlation for the actual target responses.
+        - "r_xy": Raw correlation between predicted and actual responses (uncorrected).
+        - "denom_sb": Denominator for the noise-corrected correlation 
+                      (i.e., sqrt(r_xx_sb * r_yy_sb)).
+
+        Each of these values is shaped
+        (num_bootstrap_iters, number_of_splits, number_of_units),
+        or returned as an xarray.DataArray with labeled dimensions if the target is an xarray.
+        The key "r_xy_n_sb" is typically the primary measure of interest.
     """
     results_arr = Parallel(n_jobs=num_parallel_jobs)(
         delayed(get_linregress_consistency_persphalftrial)(
