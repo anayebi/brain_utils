@@ -4,7 +4,7 @@ Basic utilities for comparing models to neural & behavioral data, along with pac
 # Installation
 To install run:
 ```
-git clone https://github.com/anayebi/brainmodel_utils
+git clone https://github.com/neuroagents-lab/brainmodel_utils
 cd brainmodel_utils/
 pip install -e .
 ```
